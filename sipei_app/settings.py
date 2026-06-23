@@ -58,7 +58,7 @@ ROOT_URLCONF = 'sipei_app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'sipei_frontend'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
