@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'sipei_backend',
 ]
 
+AUTH_USER_MODEL = 'sipei_backend.Usuario'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
