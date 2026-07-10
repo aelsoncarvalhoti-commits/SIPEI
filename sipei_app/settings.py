@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-do@l=)6^qd8pw266mq0k(n^%^ohww+0e-m+j3ia^)&+sp*q46w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -104,7 +104,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [ BASE_DIR / 'sipei_frontend']
+STATICFILES_DIRS = [
+    BASE_DIR / "sipei_frontend" / "static",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
