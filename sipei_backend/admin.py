@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Usuario
+from .models import Usuario, Aluno
 # Register your models here.
+
+admin.site.register(Aluno)
 
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
