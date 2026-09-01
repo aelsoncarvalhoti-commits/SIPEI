@@ -1,4 +1,5 @@
 {% load static %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -94,6 +95,15 @@
         .nav-item:hover, .nav-item.active {
             background-color: rgba(255, 255, 255, 0.15);
             color: white;
+        }
+
+        .sidebar-footer button.nav-item {
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         /* Main Content */
