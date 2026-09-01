@@ -25,3 +25,22 @@ class Aluno(models.Model):
 
     def __str__(self):
         return self.nome
+
+class Pei(models.Model):
+    aluno = models.OneToOneField(Aluno, on_delete=models.CASCADE, null=False, blank=False)
+    ativo = models.BooleanField(default=False)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+class Diagnosticos(models.Model):
+
+    pei = models.ForeignKey(Pei, on_delete=models.CASCADE)
+    laudo = models.BooleanField(default=False)
+    diagnostico = models.TextField(max_length=300)
+    ano = models.DateField()
+
+class Procedimento(models.Model):
+
+    diagnostico = models.ForeignKey(Diagnosticos, on_delete=models.CASCADE)
+    atendimento = models.CharField(max_length=30)
+    prioridade = models.CharField(max_length=30)
+

@@ -11,6 +11,7 @@
     </div>
     <div class="user-avatar">
         <span class="material-symbols-outlined">account_circle</span>
+        <p>{{user.username}}</p>
     </div>
 </header>
 
@@ -18,22 +19,22 @@
 <div class="stats-grid">
     <div class="card stat-card border-green">
         <span class="stat-title green">Estudantes Atendidos</span>
-        <span class="stat-number">80</span>
+        <span class="stat-number">{{alunos.count}}</span>
         <span class="stat-desc">Total de Estudantes</span>
     </div>
     <div class="card stat-card border-green">
         <span class="stat-title green">PEIs ativos</span>
-        <span class="stat-number">56</span>
+        <span class="stat-number">{{peis.count}}</span>
         <span class="stat-desc">PEIs em andamento</span>
     </div>
     <div class="card stat-card border-orange">
         <span class="stat-title orange">Pendentes de revisão</span>
-        <span class="stat-number orange">24</span>
+        <span class="stat-number orange">{{peisrevisao.count}}</span>
         <span class="stat-desc">PEIs aguardando revisão</span>
     </div>
     <div class="card stat-card border-purple">
         <span class="stat-title purple">Concluídos</span>
-        <span class="stat-number purple">9</span>
+        <span class="stat-number purple">{{peisconcluidos.count}}</span>
         <span class="stat-desc">PEIs finalizados</span>
     </div>
 </div>

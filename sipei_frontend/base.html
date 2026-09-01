@@ -390,7 +390,25 @@
 
         <div class="sidebar-footer">
             <a href="#" class="nav-item"><span class="material-symbols-outlined">help</span> Ajuda</a>
-            <a href="#" class="nav-item"><span class="material-symbols-outlined">logout</span> Sair</a>
+
+            {% if user.is_authenticated %}
+
+                <form method="POST" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-item">
+                        <span class="material-symbols-outlined">logout</span>
+                        Sair
+                    </button>
+                </form>
+
+            {% else %}
+
+                <a href="{% url 'login' %}" class="nav-item">
+                    <span class="material-symbols-outlined">login</span>
+                    Entrar
+                </a>
+
+            {% endif %}
         </div>
     </aside>
 
