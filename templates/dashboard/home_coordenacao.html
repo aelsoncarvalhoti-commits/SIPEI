@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block page_title %}Bem-Vindo, {{ user.get_perfil_display }}{% endblock %}
+{% block breadcrumb %}<div class="subtitle">Sistema de Gestão do Plano Educacional Individualizado - PEI</div>{% endblock %}
+{% block content %}
+
+<div class="grid grid-4" style="margin-bottom:1.25rem">
+  <div class="stat-card stat-card--green">
+    <span class="stat-label">Estudantes Atendidos</span>
+    <div class="stat-value">{{ total_estudantes }}</div>
+    <span class="stat-sub">Total de Estudantes</span>
+  </div>
+  <div class="stat-card stat-card--green">
+    <span class="stat-label">PEIs ativos</span>
+    <div class="stat-value">{{ total_peis_ativos }}</div>
+    <span class="stat-sub">PEIs em andamento</span>
+  </div>
+  <div class="stat-card stat-card--orange">
+    <span class="stat-label">Pendentes de revisão</span>
+    <div class="stat-value">{{ total_pendentes_revisao }}</div>
+    <span class="stat-sub">PEIs aguardando revisão</span>
+  </div>
+  <div class="stat-card stat-card--purple">
+    <span class="stat-label">Concluídos</span>
+    <div class="stat-value">{{ total_concluidos }}</div>
+    <span class="stat-sub">PEIs finalizados</span>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <div class="card-header"><h2>Distribuição por tipo de necessidade</h2></div>
+    {% if por_necessidade %}
+    <div class="pie-wrap">
+      <div class="pie-chart donut" style="background:{{ grafico_css|safe }}"></div>
+      <ul class="pie-legend">
+        {% for item in por_necessidade %}
+        <li>
+          <span class="label"><span class="dot" style="background:{{ item.cor }}"></span>{{ item.label }}</span>
+          <span class="count">{{ item.total }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% else %}
+    <div class="empty-state">{% icon 'bar-chart' size=28 %}<div style="margin-top:.5rem">Nenhum estudante cadastrado ainda.</div></div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>Próximas atualizações de PEI</h2>
+      <a class="btn btn-sm btn-outline" href="{% url 'pei:list' %}">Ver PEIs</a>
+    </div>
+    {% if peis_vencendo %}
+    <ul class="avatar-list">
+      {% for pei in peis_vencendo %}
+      <li>
+        <div class="avatar">{% icon 'user' size=16 %}</div>
+        <div class="info">
+          <a class="name" href="{% url 'estudantes:detail' pei.estudante.pk %}">{{ pei.estudante.nome_completo }}</a>
+          <span class="sub">
+            {% if pei.dias_para_vencer == 0 %}PEI vence hoje
+            {% else %}PEI vence em {{ pei.dias_para_vencer }} dia{{ pei.dias_para_vencer|pluralize }}{% endif %}
+          </span>
+        </div>
+        <span class="date">{{ pei.data_validade|date:'d/m/Y' }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state">{% icon 'check-circle' size=28 %}<div style="margin-top:.5rem">Nenhum PEI vencendo nos próximos 30 dias.</div></div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="section-title">Acessos rápidos</div>
+<div class="quick-panel">
+  <a class="quick-link" href="{% url 'estudantes:create' %}">
+    <div class="icon-box">{% icon 'user-plus' size=20 %}</div>
+    <div>
+      <div class="title">Novo estudante</div>
+      <div class="subtitle">Cadastrar novo discente</div>
+    </div>
+  </a>
+  <a class="quick-link" href="{% url 'estudantes:list' %}">
+    <div class="icon-box">{% icon 'file-plus' size=20 %}</div>
+    <div>
+      <div class="title">Novo PEI</div>
+      <div class="subtitle">Criar plano individualizado</div>
+    </div>
+  </a>
+  <a class="quick-link" href="{% url 'dashboard:relatorios' %}">
+    <div class="icon-box">{% icon 'bar-chart' size=20 %}</div>
+    <div>
+      <div class="title">Relatórios</div>
+      <div class="subtitle">Gerar relatórios e indicadores</div>
+    </div>
+  </a>
+</div>
+
+{% endblock %}

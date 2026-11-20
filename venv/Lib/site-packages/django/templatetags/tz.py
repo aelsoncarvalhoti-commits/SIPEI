@@ -1,7 +1,5 @@
 import zoneinfo
-from datetime import datetime
-from datetime import timezone as datetime_timezone
-from datetime import tzinfo
+from datetime import UTC, datetime, tzinfo
 
 from django.template import Library, Node, TemplateSyntaxError
 from django.utils import timezone
@@ -33,7 +31,7 @@ def utc(value):
     """
     Convert a datetime to UTC.
     """
-    return do_timezone(value, datetime_timezone.utc)
+    return do_timezone(value, UTC)
 
 
 @register.filter("timezone")
@@ -53,7 +51,7 @@ def do_timezone(value, arg):
         if timezone.is_naive(value):
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
-    # Filters must never raise exceptionsm, so catch everything.
+    # Filters must never raise exceptions, so catch everything.
     except Exception:
         return ""
 

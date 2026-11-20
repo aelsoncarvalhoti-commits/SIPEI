@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block page_title %}PEI — {{ estudante.nome_completo }}{% endblock %}
+{% block breadcrumb %}<div class="breadcrumb"><a href="{% url 'estudantes:detail' estudante.pk %}">{{ estudante.nome_completo }}</a> / PEI</div>{% endblock %}
+{% block topbar_actions %}
+<div class="btn-group">
+  {% if pei %}<a class="btn btn-outline" href="{% url 'pei:pdf' estudante.pk %}" target="_blank">{% icon 'download' size=16 %} Exportar PDF</a>{% endif %}
+  {% if user.is_coordenacao %}<a class="btn" href="{% url 'pei:update' estudante.pk %}">{% if pei %}Editar PEI{% else %}Elaborar PEI{% endif %}</a>{% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% if not pei %}
+<div class="card">
+  <div class="empty-state">
+    {% icon 'file-text' size=28 %}
+    <div style="margin-top:.5rem">Este estudante ainda não possui um Plano Educacional Individualizado elaborado.</div>
+    {% if user.is_coordenacao %}
+    <div style="margin-top:1rem"><a class="btn" href="{% url 'pei:update' estudante.pk %}">Elaborar PEI</a></div>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+
+<div class="card" style="margin-bottom:1.25rem">
+  <div class="d-flex justify-between align-center flex-wrap gap-2">
+    <div>
+      <h2 style="margin-bottom:.25rem">Plano Educacional Individualizado</h2>
+      <div class="text-muted">{{ estudante.nome_completo }} · Matrícula {{ estudante.matricula }}</div>
+    </div>
+    <div>
+      {% if pei.status == 'vigente' %}<span class="badge">Vigente</span>
+      {% elif pei.status == 'vencido' %}<span class="badge badge-danger">Vencido</span>
+      {% else %}<span class="badge badge-warning">{{ pei.get_status_display }}</span>{% endif %}
+    </div>
+  </div>
+  <div class="grid grid-3" style="margin-top:1.25rem">
+    <div><div class="text-muted" style="font-size:.78rem">Elaboração</div><strong>{{ pei.data_elaboracao|date:'d/m/Y'|default:'—' }}</strong></div>
+    <div><div class="text-muted" style="font-size:.78rem">Válido até</div><strong>{{ pei.data_validade|date:'d/m/Y'|default:'—' }}</strong></div>
+    <div><div class="text-muted" style="font-size:.78rem">Responsável</div><strong>{{ pei.responsavel_elaboracao|default:'—' }}</strong></div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Objetivos gerais</h3>
+  <p>{{ pei.objetivos_gerais|linebreaksbr|default:'Não informado.' }}</p>
+  <h3>Observações gerais</h3>
+  <p>{{ pei.observacoes_gerais|linebreaksbr|default:'Não informado.' }}</p>
+</div>
+
+<div class="grid grid-2" style="margin-top:1.25rem">
+  <div class="card">
+    <h3>Diagnóstico</h3>
+    {% if diagnostico %}
+    <p><strong>CID:</strong> {{ diagnostico.cid|default:'—' }}</p>
+    <p>{{ diagnostico.descricao|linebreaksbr|default:'—' }}</p>
+    {% else %}<p class="text-muted">Não cadastrado.</p>{% endif %}
+  </div>
+  <div class="card">
+    <h3>Perfil de aprendizagem</h3>
+    {% if perfil_aprendizagem %}
+    <p><strong>Pontos fortes:</strong> {{ perfil_aprendizagem.pontos_fortes|default:'—' }}</p>
+    <p><strong>Dificuldades:</strong> {{ perfil_aprendizagem.dificuldades|default:'—' }}</p>
+    {% else %}<p class="text-muted">Não cadastrado.</p>{% endif %}
+  </div>
+</div>
+
+<div class="card" style="margin-top:1.25rem">
+  <h3>Adaptações necessárias</h3>
+  {% if adaptacoes %}
+  <table class="data-table">
+    {% for item in adaptacoes %}
+    <tr><td style="width:20%"><span class="badge">{{ item.get_tipo_display }}</span></td><td>{{ item.disciplina|default:'Geral' }} — {{ item.descricao }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="text-muted">Nenhuma adaptação cadastrada.</p>{% endif %}
+</div>
+
+<div class="card" style="margin-top:1.25rem">
+  <h3>Planejamento pedagógico</h3>
+  {% if planejamentos %}
+  <table class="data-table">
+    <thead><tr><th>Componente</th><th>Objetivo</th><th>Meta</th><th>Status</th></tr></thead>
+    {% for item in planejamentos %}
+    <tr><td>{{ item.disciplina|default:'—' }}</td><td>{{ item.objetivo }}</td><td>{{ item.meta|default:'—' }}</td><td>{{ item.get_status_display }}</td></tr>
+    {% endfor %}
+  </table>
+  {% else %}<p class="text-muted">Nenhum planejamento cadastrado.</p>{% endif %}
+</div>
+
+{% endif %}
+{% endblock %}

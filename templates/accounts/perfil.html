@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block page_title %}Configurações{% endblock %}
+{% block content %}
+<div class="card" style="max-width:520px">
+  <div class="d-flex align-center gap-2" style="margin-bottom:1.25rem">
+    <div class="avatar avatar-lg">{{ user.first_name|slice:':1' }}{{ user.last_name|slice:':1' }}</div>
+    <div>
+      <h2 style="margin-bottom:.15rem">{{ user.get_full_name|default:user.username }}</h2>
+      <span class="badge">{{ user.get_perfil_display }}</span>
+    </div>
+  </div>
+  <table class="data-table">
+    <tr><th style="width:40%">Usuário</th><td>{{ user.username }}</td></tr>
+    <tr><th>E-mail</th><td>{{ user.email|default:'—' }}</td></tr>
+    <tr><th>Matrícula/SIAPE</th><td>{{ user.registro|default:'—' }}</td></tr>
+    <tr><th>Campus</th><td>{{ user.campus|default:'—' }}</td></tr>
+    <tr><th>Telefone</th><td>{{ user.telefone|default:'—' }}</td></tr>
+  </table>
+  <p class="form-help" style="margin-top:1rem">Para alterar seus dados, entre em contato com a Coordenação CAPNE/AEE.</p>
+</div>
+{% endblock %}

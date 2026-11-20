@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @page { size: A4; margin: 2cm 1.8cm; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #1c2621; }
+  .header { text-align: center; margin-bottom: 18px; border-bottom: 2px solid #14432b; padding-bottom: 10px; }
+  .header h1 { font-size: 15pt; color: #14432b; margin: 0 0 2px; }
+  .header .sub { font-size: 9pt; color: #555; }
+  h2 { font-size: 12pt; color: #14432b; border-bottom: 1px solid #d8ded9; padding-bottom: 4px; margin-top: 18px; margin-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+  td, th { padding: 4px 6px; font-size: 9.5pt; vertical-align: top; text-align: left; }
+  .info-table td.label { width: 32%; color: #555; font-weight: bold; }
+  .box { background: #f2faf5; border: 1px solid #cfe8da; padding: 8px 10px; border-radius: 4px; margin-bottom: 8px; }
+  .list-table th { background: #e6f4ec; color: #14432b; font-size: 8.5pt; text-transform: uppercase; }
+  .list-table td, .list-table th { border-bottom: 1px solid #e3e9e5; }
+  .footer { margin-top: 24px; font-size: 8.5pt; color: #777; text-align: center; }
+  .status { display: inline-block; padding: 2px 8px; border-radius: 8px; background: #e6f4ec; color: #14432b; font-size: 9pt; }
+  .sign-row { margin-top: 40px; }
+  .sign-line { border-top: 1px solid #444; width: 70%; margin: 30px auto 4px; text-align: center; padding-top: 4px; font-size: 9pt; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Plano Educacional Individualizado (PEI)</h1>
+  <div class="sub">SIPEI — Sistema Integrado de Plano Educacional Individualizado &middot; CAPNE/AEE &middot; IFBA {{ estudante.campus }}</div>
+</div>
+
+<h2>Identificação do estudante</h2>
+<table class="info-table">
+  <tr><td class="label">Nome completo</td><td>{{ estudante.nome_completo }}</td></tr>
+  <tr><td class="label">Matrícula</td><td>{{ estudante.matricula }}</td></tr>
+  <tr><td class="label">Curso / Turma</td><td>{{ estudante.curso|default:'—' }}{% if estudante.turma %} / {{ estudante.turma }}{% endif %}</td></tr>
+  <tr><td class="label">Data de nascimento</td><td>{{ estudante.data_nascimento|date:'d/m/Y'|default:'—' }}</td></tr>
+  <tr><td class="label">Necessidade específica</td><td>{{ estudante.get_necessidade_especifica_display }}</td></tr>
+  <tr><td class="label">Responsável</td><td>{{ estudante.responsavel_nome|default:'—' }} {% if estudante.responsavel_telefone %}({{ estudante.responsavel_telefone }}){% endif %}</td></tr>
+</table>
+
+<h2>Dados do plano</h2>
+<table class="info-table">
+  <tr><td class="label">Status</td><td><span class="status">{{ pei.get_status_display }}</span></td></tr>
+  <tr><td class="label">Data de elaboração</td><td>{{ pei.data_elaboracao|date:'d/m/Y'|default:'—' }}</td></tr>
+  <tr><td class="label">Válido até</td><td>{{ pei.data_validade|date:'d/m/Y'|default:'—' }}</td></tr>
+  <tr><td class="label">Responsável pela elaboração</td><td>{{ pei.responsavel_elaboracao|default:'—' }}</td></tr>
+</table>
+
+<h2>Objetivos gerais</h2>
+<div class="box">{{ pei.objetivos_gerais|linebreaksbr|default:'Não informado.' }}</div>
+
+{% if diagnostico %}
+<h2>Diagnóstico</h2>
+<table class="info-table">
+  <tr><td class="label">CID</td><td>{{ diagnostico.cid|default:'—' }}</td></tr>
+  <tr><td class="label">Descrição</td><td>{{ diagnostico.descricao|default:'—' }}</td></tr>
+</table>
+{% endif %}
+
+{% if perfil_aprendizagem %}
+<h2>Perfil de aprendizagem</h2>
+<table class="info-table">
+  <tr><td class="label">Pontos fortes</td><td>{{ perfil_aprendizagem.pontos_fortes|default:'—' }}</td></tr>
+  <tr><td class="label">Dificuldades</td><td>{{ perfil_aprendizagem.dificuldades|default:'—' }}</td></tr>
+  <tr><td class="label">Estilo de aprendizagem</td><td>{{ perfil_aprendizagem.estilo_aprendizagem|default:'—' }}</td></tr>
+</table>
+{% endif %}
+
+{% if adaptacoes %}
+<h2>Adaptações necessárias</h2>
+<table class="list-table">
+  <tr><th>Tipo</th><th>Componente</th><th>Descrição</th></tr>
+  {% for item in adaptacoes %}
+  <tr><td>{{ item.get_tipo_display }}</td><td>{{ item.disciplina|default:'Geral' }}</td><td>{{ item.descricao }}</td></tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% if componentes %}
+<h2>Componentes curriculares</h2>
+<table class="list-table">
+  <tr><th>Componente</th><th>Professor(a)</th><th>Adaptações necessárias</th></tr>
+  {% for item in componentes %}
+  <tr><td>{{ item.disciplina }}</td><td>{{ item.professor|default:'—' }}</td><td>{{ item.adaptacoes_necessarias|default:'—' }}</td></tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% if planejamentos %}
+<h2>Planejamento pedagógico</h2>
+<table class="list-table">
+  <tr><th>Componente</th><th>Objetivo</th><th>Meta</th><th>Status</th></tr>
+  {% for item in planejamentos %}
+  <tr><td>{{ item.disciplina|default:'—' }}</td><td>{{ item.objetivo }}</td><td>{{ item.meta|default:'—' }}</td><td>{{ item.get_status_display }}</td></tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+<h2>Observações gerais</h2>
+<div class="box">{{ pei.observacoes_gerais|linebreaksbr|default:'Não informado.' }}</div>
+
+<div class="sign-row">
+  <div class="sign-line">Coordenação CAPNE/AEE</div>
+  <div class="sign-line">Professor(a) responsável</div>
+</div>
+
+<div class="footer">
+  Documento gerado automaticamente pelo SIPEI em {% now 'd/m/Y H:i' %}.
+</div>
+
+</body>
+</html>

@@ -6,6 +6,7 @@ from django.apps import apps
 from django.core.management.base import BaseCommand, CommandError, no_translations
 from django.core.management.sql import emit_post_migrate_signal, emit_pre_migrate_signal
 from django.db import DEFAULT_DB_ALIAS, connections, router
+from django.db.backends.utils import truncate_name
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
@@ -113,7 +114,8 @@ class Command(BaseCommand):
         # Work out which apps have migrations and which do not
         executor = MigrationExecutor(connection, self.migration_progress_callback)
 
-        # Raise an error if any migrations are applied before their dependencies.
+        # Raise an error if any migrations are applied before their
+        # dependencies.
         executor.loader.check_consistent_history(connection)
 
         # Before anything else, see if there's conflicting apps and drop out
@@ -357,8 +359,8 @@ class Command(BaseCommand):
             fake=fake,
             fake_initial=fake_initial,
         )
-        # post_migrate signals have access to all models. Ensure that all models
-        # are reloaded in case any are delayed.
+        # post_migrate signals have access to all models. Ensure that all
+        # models are reloaded in case any are delayed.
         post_migrate_state.clear_delayed_apps_cache()
         post_migrate_apps = post_migrate_state.apps
 
@@ -375,8 +377,8 @@ class Command(BaseCommand):
             [ModelState.from_model(apps.get_model(*model)) for model in model_keys]
         )
 
-        # Send the post_migrate signal, so individual apps can do whatever they need
-        # to do at this point.
+        # Send the post_migrate signal, so individual apps can do whatever they
+        # need to do at this point.
         emit_post_migrate_signal(
             self.verbosity,
             self.interactive,
@@ -446,8 +448,9 @@ class Command(BaseCommand):
         def model_installed(model):
             opts = model._meta
             converter = connection.introspection.identifier_converter
+            max_name_length = connection.ops.max_name_length()
             return not (
-                (converter(opts.db_table) in tables)
+                (converter(truncate_name(opts.db_table, max_name_length)) in tables)
                 or (
                     opts.auto_created
                     and converter(opts.auto_created._meta.db_table) in tables

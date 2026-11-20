@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block page_title %}{% if novo %}Novo usuário{% else %}Editar usuário{% endif %}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:640px">
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.first_name.id_for_label }}">Nome</label>
+        {{ form.first_name }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.last_name.id_for_label }}">Sobrenome</label>
+        {{ form.last_name }}
+      </div>
+    </div>
+
+    {% if novo %}
+    <div class="form-group">
+      <label for="{{ form.username.id_for_label }}">Usuário (login)</label>
+      {{ form.username }}
+      {{ form.username.errors }}
+    </div>
+    {% endif %}
+
+    <div class="form-group">
+      <label for="{{ form.email.id_for_label }}">E-mail</label>
+      {{ form.email }}
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.perfil.id_for_label }}">Perfil de acesso</label>
+        {{ form.perfil }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.registro.id_for_label }}">Matrícula/SIAPE</label>
+        {{ form.registro }}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.campus.id_for_label }}">Campus</label>
+        {{ form.campus }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.telefone.id_for_label }}">Telefone</label>
+        {{ form.telefone }}
+      </div>
+    </div>
+
+    {% if novo %}
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.password1.id_for_label }}">Senha</label>
+        {{ form.password1 }}
+        {{ form.password1.errors }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.password2.id_for_label }}">Confirmar senha</label>
+        {{ form.password2 }}
+        {{ form.password2.errors }}
+      </div>
+    </div>
+    {% else %}
+    <div class="form-group form-check">
+      {{ form.ativo }}
+      <label for="{{ form.ativo.id_for_label }}" class="mb-0">Usuário ativo</label>
+    </div>
+    {% endif %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn">Salvar</button>
+      <a class="btn btn-outline" href="{% url 'accounts:usuario_list' %}">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

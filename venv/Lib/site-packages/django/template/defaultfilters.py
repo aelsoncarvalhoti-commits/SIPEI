@@ -169,9 +169,10 @@ def floatformat(text, arg=-1):
         # Exponent values can be "F", "n", "N".
         number_of_digits_and_exponent_sum = 0
 
-    # Values with more than 200 digits, or with a large exponent, are returned "as is"
-    # to avoid high memory consumption and potential denial-of-service attacks.
-    # The cut-off of 200 is consistent with django.utils.numberformat.floatformat().
+    # Values with more than 200 digits, or with a large exponent, are returned
+    # "as is" to avoid high memory consumption and potential denial-of-service
+    # attacks. The cut-off of 200 is consistent with
+    # django.utils.numberformat.floatformat().
     if number_of_digits_and_exponent_sum > 200:
         return input_val
 
@@ -281,7 +282,8 @@ def stringformat(value, arg):
     This specifier uses Python string formatting syntax, with the exception
     that the leading "%" is dropped.
 
-    See https://docs.python.org/library/stdtypes.html#printf-style-string-formatting
+    See
+    https://docs.python.org/library/stdtypes.html#printf-style-string-formatting
     for documentation of Python string formatting.
     """
     if isinstance(value, tuple):
@@ -430,7 +432,10 @@ def rjust(value, arg):
 @stringfilter
 def center(value, arg):
     """Center the value in a field of a given width."""
-    return value.center(int(arg))
+    width = int(arg)
+    if width <= 0:
+        return value
+    return f"{value:^{width}}"
 
 
 @register.filter
@@ -661,6 +666,31 @@ def slice_filter(value, arg):
         return value  # Fail silently.
 
 
+def _walk_items(item_list):
+    item_iterator = iter(item_list)
+    try:
+        item = next(item_iterator)
+        while True:
+            try:
+                next_item = next(item_iterator)
+            except StopIteration:
+                yield item, None
+                break
+            if isinstance(next_item, (list, tuple, types.GeneratorType)):
+                try:
+                    iter(next_item)
+                except TypeError:
+                    pass
+                else:
+                    yield item, next_item
+                    item = next(item_iterator)
+                    continue
+            yield item, None
+            item = next_item
+    except StopIteration:
+        pass
+
+
 @register.filter(is_safe=True, needs_autoescape=True)
 def unordered_list(value, autoescape=True):
     """
@@ -690,34 +720,10 @@ def unordered_list(value, autoescape=True):
         def escaper(x):
             return x
 
-    def walk_items(item_list):
-        item_iterator = iter(item_list)
-        try:
-            item = next(item_iterator)
-            while True:
-                try:
-                    next_item = next(item_iterator)
-                except StopIteration:
-                    yield item, None
-                    break
-                if isinstance(next_item, (list, tuple, types.GeneratorType)):
-                    try:
-                        iter(next_item)
-                    except TypeError:
-                        pass
-                    else:
-                        yield item, next_item
-                        item = next(item_iterator)
-                        continue
-                yield item, None
-                item = next_item
-        except StopIteration:
-            pass
-
     def list_formatter(item_list, tabs=1):
         indent = "\t" * tabs
         output = []
-        for item, children in walk_items(item_list):
+        for item, children in _walk_items(item_list):
             sublist = ""
             if children:
                 sublist = "\n%s<ul>\n%s\n%s</ul>\n%s" % (

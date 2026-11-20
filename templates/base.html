@@ -1,0 +1,107 @@
+{% load static icons %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}SIPEI{% endblock %} — SIPEI</title>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo-grid"><span></span><span></span><span></span><span></span></div>
+      <div>
+        <strong>Instituto Federal Bahia</strong>
+        <span>Campus Porto Seguro</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{% url 'dashboard:home' %}" class="{% if request.resolver_match.view_name == 'dashboard:home' %}active{% endif %}">
+        {% icon 'home' %} Home
+      </a>
+      <a href="{% url 'estudantes:list' %}" class="{% if 'estudantes' in request.resolver_match.namespaces %}active{% endif %}">
+        {% icon 'users' %} Estudantes
+      </a>
+      <a href="{% url 'pei:list' %}" class="{% if 'pei' in request.resolver_match.namespaces %}active{% endif %}">
+        {% icon 'file-text' %} PEIs
+      </a>
+      <a href="{% url 'estudantes:acompanhamento_historico' %}" class="{% if request.resolver_match.url_name == 'acompanhamento_historico' %}active{% endif %}">
+        {% icon 'clipboard' %} Acompanhamentos
+      </a>
+      {% if user.is_coordenacao %}
+      <a href="{% url 'dashboard:relatorios' %}" class="{% if request.resolver_match.view_name == 'dashboard:relatorios' %}active{% endif %}">
+        {% icon 'bar-chart' %} Relatórios
+      </a>
+      <a href="{% url 'accounts:usuario_list' %}" class="{% if request.resolver_match.url_name == 'usuario_list' or request.resolver_match.url_name == 'usuario_create' or request.resolver_match.url_name == 'usuario_update' %}active{% endif %}">
+        {% icon 'users' %} Usuários
+      </a>
+      {% endif %}
+      <a href="{% url 'accounts:perfil' %}" class="{% if request.resolver_match.url_name == 'perfil' %}active{% endif %}">
+        {% icon 'settings' %} Configurações
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <a href="{% url 'dashboard:ajuda' %}">{% icon 'help-circle' %} Ajuda</a>
+      <form action="{% url 'accounts:logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">{% icon 'log-out' %} Sair</button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="d-flex align-center gap-2">
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">{% icon 'menu' size=22 %}</button>
+        <div>
+          <h1>{% block page_title %}Painel{% endblock %}</h1>
+          {% block breadcrumb %}{% endblock %}
+        </div>
+      </div>
+      <div class="d-flex align-center gap-2">
+        {% block topbar_actions %}{% endblock %}
+        <a href="{% url 'accounts:perfil' %}" class="topbar-profile" title="{{ user.get_full_name|default:user.username }} — {{ user.get_perfil_display }}">
+          {% icon 'user' size=20 %}
+          <span class="status-dot"></span>
+        </a>
+      </div>
+    </header>
+
+    <div class="content">
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <li class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+
+<script>
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const toggle = document.getElementById('menuToggle');
+  function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('open'); }
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    });
+  }
+  if (overlay) overlay.addEventListener('click', closeSidebar);
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

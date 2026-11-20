@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block page_title %}{% if novo %}Elaborar PEI{% else %}Editar PEI{% endif %} — {{ estudante.nome_completo }}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:760px">
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.status.id_for_label }}">Status</label>
+        {{ form.status }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.data_elaboracao.id_for_label }}">Data de elaboração</label>
+        {{ form.data_elaboracao }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.data_validade.id_for_label }}">Válido até</label>
+        {{ form.data_validade }}
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="{{ form.objetivos_gerais.id_for_label }}">Objetivos gerais do PEI</label>
+      {{ form.objetivos_gerais }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.observacoes_gerais.id_for_label }}">Observações gerais</label>
+      {{ form.observacoes_gerais }}
+    </div>
+    <p class="form-help">
+      Diagnóstico, perfil de aprendizagem, adaptações e planejamentos são gerenciados nas respectivas abas do perfil do estudante e aparecem automaticamente no PEI.
+    </p>
+    <div class="form-actions">
+      <button type="submit" class="btn">Salvar PEI</button>
+      <a class="btn btn-outline" href="{% url 'pei:detail' estudante.pk %}">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block page_title %}{% if novo %}Cadastro de estudante{% else %}Editar estudante{% endif %}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:760px">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="section-title">Identificação</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.nome_completo.id_for_label }}">Nome completo</label>
+        {{ form.nome_completo }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.matricula.id_for_label }}">Matrícula</label>
+        {{ form.matricula }}
+        {{ form.matricula.errors }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.data_nascimento.id_for_label }}">Data de nascimento</label>
+        {{ form.data_nascimento }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.curso.id_for_label }}">Curso</label>
+        {{ form.curso }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.turma.id_for_label }}">Turma</label>
+        {{ form.turma }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.campus.id_for_label }}">Campus</label>
+        {{ form.campus }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.foto.id_for_label }}">Foto</label>
+        {{ form.foto }}
+      </div>
+    </div>
+
+    <div class="section-title">Contato</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.telefone.id_for_label }}">Telefone do estudante</label>
+        {{ form.telefone }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.email.id_for_label }}">E-mail do estudante</label>
+        {{ form.email }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.responsavel_nome.id_for_label }}">Nome do responsável</label>
+        {{ form.responsavel_nome }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.responsavel_telefone.id_for_label }}">Telefone do responsável</label>
+        {{ form.responsavel_telefone }}
+      </div>
+    </div>
+
+    <div class="section-title">Necessidade específica e acompanhamento</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="{{ form.necessidade_especifica.id_for_label }}">Necessidade específica</label>
+        {{ form.necessidade_especifica }}
+      </div>
+      <div class="form-group">
+        <label for="{{ form.professor_responsavel.id_for_label }}">Professor(a) AEE responsável</label>
+        {{ form.professor_responsavel }}
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="{{ form.descricao_necessidade.id_for_label }}">Descrição da necessidade</label>
+      {{ form.descricao_necessidade }}
+    </div>
+
+    {% if not novo %}
+    <div class="form-group form-check">
+      {{ form.ativo }}
+      <label for="{{ form.ativo.id_for_label }}" class="mb-0">Estudante ativo</label>
+    </div>
+    {% endif %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn">Salvar</button>
+      {% if estudante %}
+      <a class="btn btn-outline" href="{% url 'estudantes:detail' estudante.pk %}">Cancelar</a>
+      {% else %}
+      <a class="btn btn-outline" href="{% url 'estudantes:list' %}">Cancelar</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}

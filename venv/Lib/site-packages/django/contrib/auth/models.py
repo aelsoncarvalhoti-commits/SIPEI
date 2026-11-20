@@ -79,8 +79,13 @@ class Permission(models.Model):
     def __str__(self):
         return "%s | %s" % (self.content_type, self.name)
 
+    @property
+    def user_perm_str(self):
+        """String representation for the user permission check."""
+        return f"{self.content_type.app_label}.{self.codename}"
+
     def natural_key(self):
-        return (self.codename,) + self.content_type.natural_key()
+        return (self.codename, *self.content_type.natural_key())
 
     natural_key.dependencies = ["contenttypes.contenttype"]
 
@@ -215,9 +220,9 @@ class UserManager(BaseUserManager):
         self, perm, is_active=True, include_superusers=True, backend=None, obj=None
     ):
         if backend is None:
-            backends = auth._get_backends(return_tuples=True)
+            backends = auth.get_backends()
             if len(backends) == 1:
-                backend, _ = backends[0]
+                backend = backends[0]
             else:
                 raise ValueError(
                     "You have multiple authentication backends configured and "
@@ -260,7 +265,7 @@ async def _auser_get_permissions(user, obj, from_name):
 
 def _user_has_perm(user, perm, obj):
     """
-    A backend can raise `PermissionDenied` to short-circuit permission checking.
+    A backend can raise `PermissionDenied` to short-circuit permission checks.
     """
     for backend in auth.get_backends():
         if not hasattr(backend, "has_perm"):
@@ -288,7 +293,7 @@ async def _auser_has_perm(user, perm, obj):
 
 def _user_has_module_perms(user, app_label):
     """
-    A backend can raise `PermissionDenied` to short-circuit permission checking.
+    A backend can raise `PermissionDenied` to short-circuit permission checks.
     """
     for backend in auth.get_backends():
         if not hasattr(backend, "has_module_perms"):

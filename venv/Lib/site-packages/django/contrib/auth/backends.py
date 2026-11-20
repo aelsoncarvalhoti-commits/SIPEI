@@ -1,8 +1,13 @@
 from asgiref.sync import sync_to_async
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import (
+    acheck_password_with_timing_attack_mitigation,
+    check_password_with_timing_attack_mitigation,
+    get_user_model,
+)
 from django.contrib.auth.models import Permission
 from django.db.models import Exists, OuterRef, Q
+from django.views.decorators.debug import sensitive_variables
 
 UserModel = get_user_model()
 
@@ -56,6 +61,7 @@ class ModelBackend(BaseBackend):
     Authenticates against settings.AUTH_USER_MODEL.
     """
 
+    @sensitive_variables("password")
     def authenticate(self, request, username=None, password=None, **kwargs):
         if username is None:
             username = kwargs.get(UserModel.USERNAME_FIELD)
@@ -64,13 +70,14 @@ class ModelBackend(BaseBackend):
         try:
             user = UserModel._default_manager.get_by_natural_key(username)
         except UserModel.DoesNotExist:
-            # Run the default password hasher once to reduce the timing
-            # difference between an existing and a nonexistent user (#20760).
-            UserModel().set_password(password)
-        else:
-            if user.check_password(password) and self.user_can_authenticate(user):
-                return user
+            user = None
 
+        if check_password_with_timing_attack_mitigation(
+            user, password
+        ) and self.user_can_authenticate(user):
+            return user
+
+    @sensitive_variables("password")
     async def aauthenticate(self, request, username=None, password=None, **kwargs):
         if username is None:
             username = kwargs.get(UserModel.USERNAME_FIELD)
@@ -79,14 +86,12 @@ class ModelBackend(BaseBackend):
         try:
             user = await UserModel._default_manager.aget_by_natural_key(username)
         except UserModel.DoesNotExist:
-            # Run the default password hasher once to reduce the timing
-            # difference between an existing and a nonexistent user (#20760).
-            UserModel().set_password(password)
-        else:
-            if await user.acheck_password(password) and self.user_can_authenticate(
-                user
-            ):
-                return user
+            user = None
+
+        if await acheck_password_with_timing_attack_mitigation(
+            user, password
+        ) and self.user_can_authenticate(user):
+            return user
 
     def user_can_authenticate(self, user):
         """
@@ -254,7 +259,7 @@ class RemoteUserBackend(ModelBackend):
     is handling authentication outside of Django.
 
     By default, the ``authenticate`` method creates ``User`` objects for
-    usernames that don't already exist in the database.  Subclasses can disable
+    usernames that don't already exist in the database. Subclasses can disable
     this behavior by setting the ``create_unknown_user`` attribute to
     ``False``.
     """
@@ -318,7 +323,7 @@ class RemoteUserBackend(ModelBackend):
     def clean_username(self, username):
         """
         Perform any cleaning on the "username" prior to using it to get or
-        create the user object.  Return the cleaned username.
+        create the user object. Return the cleaned username.
 
         By default, return the username unchanged.
         """

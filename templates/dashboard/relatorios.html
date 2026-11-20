@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block page_title %}Relatórios e indicadores{% endblock %}
+{% block topbar_actions %}
+<button class="btn btn-outline" onclick="window.print()">{% icon 'file-text' size=16 %} Imprimir</button>
+{% endblock %}
+{% block content %}
+
+<div class="grid grid-4" style="margin-bottom:1.25rem">
+  <div class="stat-card stat-card--green">
+    <span class="stat-label">Estudantes ativos</span>
+    <div class="stat-value">{{ total_estudantes }}</div>
+  </div>
+  <div class="stat-card stat-card--green">
+    <span class="stat-label">Com PEI elaborado</span>
+    <div class="stat-value">{{ total_com_pei }}</div>
+  </div>
+  <div class="stat-card stat-card--orange">
+    <span class="stat-label">Sem PEI</span>
+    <div class="stat-value">{{ total_sem_pei }}</div>
+  </div>
+  <div class="stat-card stat-card--purple">
+    <span class="stat-label">Cobertura do PEI</span>
+    <div class="stat-value">
+      {% if total_estudantes %}{{ total_com_pei|floatformat:0 }}/{{ total_estudantes }}{% else %}0{% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <div class="card-header"><h2>Estudantes por necessidade específica</h2></div>
+    {% if por_necessidade %}
+    <div class="pie-wrap">
+      <div class="pie-chart donut" style="background:{{ grafico_necessidade_css|safe }}"></div>
+      <ul class="pie-legend">
+        {% for item in por_necessidade %}
+        <li>
+          <span class="label"><span class="dot" style="background:{{ item.cor }}"></span>{{ item.label }}</span>
+          <span class="count">{{ item.total }} ({{ item.percentual }}%)</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% else %}
+    <div class="empty-state">Sem dados suficientes.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>PEIs por status</h2></div>
+    {% if por_status_pei %}
+    <div class="pie-wrap">
+      <div class="pie-chart donut" style="background:{{ grafico_status_css|safe }}"></div>
+      <ul class="pie-legend">
+        {% for item in por_status_pei %}
+        <li>
+          <span class="label"><span class="dot" style="background:{{ item.cor }}"></span>{{ item.label }}</span>
+          <span class="count">{{ item.total }} ({{ item.percentual }}%)</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% else %}
+    <div class="empty-state">Nenhum PEI elaborado ainda.</div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid grid-2" style="margin-top:1.25rem">
+  <div class="card">
+    <div class="card-header"><h2>Estudantes por campus</h2></div>
+    <table class="data-table">
+      <thead><tr><th>Campus</th><th>Estudantes</th></tr></thead>
+      {% for item in por_campus %}
+      <tr><td>{{ item.campus }}</td><td>{{ item.total }}</td></tr>
+      {% empty %}
+      <tr><td colspan="2" class="text-muted">Sem dados.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>Estudantes por professor(a) AEE</h2></div>
+    <table class="data-table">
+      <thead><tr><th>Professor(a)</th><th>Estudantes</th></tr></thead>
+      {% for item in por_professor %}
+      <tr>
+        <td>{{ item.professor_responsavel__first_name }} {{ item.professor_responsavel__last_name }}</td>
+        <td>{{ item.total }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="2" class="text-muted">Nenhum professor vinculado ainda.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
+{% endblock %}

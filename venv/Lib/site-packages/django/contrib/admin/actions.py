@@ -22,9 +22,10 @@ def delete_selected(modeladmin, request, queryset):
 
     This action first displays a confirmation page which shows all the
     deletable objects, or, if the user has no permission one of the related
-    childs (foreignkeys), a "permission denied" message.
+    children (foreignkeys), a "permission denied" message.
 
-    Next, it deletes all selected objects and redirects back to the change list.
+    Next, it deletes all selected objects and redirects back to the change
+    list.
     """
     opts = modeladmin.model._meta
     app_label = opts.app_label
@@ -69,6 +70,7 @@ def delete_selected(modeladmin, request, queryset):
         "subtitle": None,
         "objects_name": str(objects_name),
         "deletable_objects": [deletable_objects],
+        "delete_confirmation_max_display": modeladmin.delete_confirmation_max_display,
         "model_count": dict(model_count).items(),
         "queryset": queryset,
         "perms_lacking": perms_needed,

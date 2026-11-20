@@ -9,14 +9,11 @@ They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
 
-import warnings
-
 from django.core import exceptions
-from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
-from . import BLANK_CHOICE_DASH
+from ..utils import get_blank_choice_label
 from .mixins import FieldCacheMixin
 
 
@@ -175,7 +172,7 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_choices(
         self,
         include_blank=True,
-        blank_choice=BLANK_CHOICE_DASH,
+        blank_choice=None,
         limit_choices_to=None,
         ordering=(),
     ):
@@ -186,20 +183,13 @@ class ForeignObjectRel(FieldCacheMixin):
         Analog of django.db.models.fields.Field.get_choices(), provided
         initially for utilization by RelatedFieldListFilter.
         """
+        if blank_choice is None:
+            blank_choice = [("", get_blank_choice_label())]
         limit_choices_to = limit_choices_to or self.limit_choices_to
         qs = self.related_model._default_manager.complex_filter(limit_choices_to)
         if ordering:
             qs = qs.order_by(*ordering)
         return (blank_choice if include_blank else []) + [(x.pk, str(x)) for x in qs]
-
-    def get_joining_columns(self):
-        warnings.warn(
-            "ForeignObjectRel.get_joining_columns() is deprecated. Use "
-            "get_joining_fields() instead.",
-            RemovedInDjango60Warning,
-            stacklevel=2,
-        )
-        return self.field.get_reverse_joining_columns()
 
     def get_joining_fields(self):
         return self.field.get_reverse_joining_fields()
@@ -303,7 +293,7 @@ class ManyToOneRel(ForeignObjectRel):
 
     @property
     def identity(self):
-        return super().identity + (self.field_name,)
+        return (*super().identity, self.field_name)
 
     def get_related_field(self):
         """
@@ -394,7 +384,8 @@ class ManyToManyRel(ForeignObjectRel):
 
     @property
     def identity(self):
-        return super().identity + (
+        return (
+            *super().identity,
             self.through,
             make_hashable(self.through_fields),
             self.db_constraint,

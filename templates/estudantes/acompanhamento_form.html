@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block page_title %}Registrar acompanhamento{% endblock %}
+{% block breadcrumb %}<div class="breadcrumb">{{ estudante.nome_completo }}</div>{% endblock %}
+{% block content %}
+<div class="card" style="max-width:700px">
+  <p class="text-muted" style="margin-top:-.25rem">
+    Registre observações datadas sobre o progresso do estudante, estratégias aplicadas e adaptações realizadas em sala de aula.
+  </p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="{{ form.data.id_for_label }}">Data</label>
+      {{ form.data }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.observacao.id_for_label }}">Observação pedagógica</label>
+      {{ form.observacao }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.estrategias_aplicadas.id_for_label }}">Estratégias aplicadas</label>
+      {{ form.estrategias_aplicadas }}
+    </div>
+    <div class="form-group">
+      <label for="{{ form.adaptacoes_realizadas.id_for_label }}">Adaptações realizadas</label>
+      {{ form.adaptacoes_realizadas }}
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn">Salvar registro</button>
+      <a class="btn btn-outline" href="{% url 'estudantes:detail' estudante.pk %}?tab=acompanhamentos">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

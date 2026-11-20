@@ -1,0 +1,163 @@
+body.sipei-login {
+  min-height: 100vh;
+  margin: 0;
+  padding: 24px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background:
+    linear-gradient(
+      rgba(255,255,255,0.72),
+      rgba(255,255,255,0.72)
+    ),
+    url("../img/campus-porto-seguro.png")
+    center center / cover no-repeat fixed;
+
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.login-container {
+  width: 100%;
+  max-width: 615px;
+  padding: 35px 35px 25px;
+
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.75);
+  border-radius: 22px;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.14);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-header h1 {
+  color: #176b29;
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.login-header p {
+  color: #222;
+  font-size: 13px;
+  margin: 3px 0 0;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 28px 42px 30px;
+
+  background: rgba(255,255,255,0.96);
+  border-radius: 20px;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.24);
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.login-logo img {
+  width: 90px;
+  max-width: 100%;
+  height: auto;
+}
+
+.login-field {
+  margin-bottom: 14px;
+}
+
+.login-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.login-field input {
+  display: block;
+  width: 100%;
+  height: 38px;
+  padding: 8px 12px;
+
+  border: 1px solid #94c29e;
+  border-radius: 5px;
+  background: #f9fbf9;
+
+  color: #222;
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.login-field input:focus {
+  outline: none;
+  border-color: #267b42;
+  box-shadow: 0 0 0 3px rgba(38,123,66,0.12);
+}
+
+.login-button {
+  display: block;
+  width: 100%;
+  margin-top: 22px;
+  padding: 11px;
+
+  background: #99c4a3;
+  color: white;
+  border: none;
+  border-radius: 25px;
+
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  transition: background 0.2s;
+}
+
+.login-button:hover {
+  background: #78ac84;
+}
+
+.login-error {
+  padding: 10px;
+  color: #a32727;
+  background: #fbe9e7;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.login-footer {
+  text-align: center;
+  font-size: 11px;
+  color: #52685a;
+  margin: 18px 0 0;
+}
+
+@media (max-width: 520px) {
+  body.sipei-login {
+    padding: 15px;
+  }
+
+  .login-container {
+    padding: 28px 15px;
+  }
+
+  .login-card {
+    padding: 25px 20px;
+  }
+
+  .login-header h1 {
+    font-size: 26px;
+  }
+
+  .login-header p {
+    font-size: 12px;
+  }
+}

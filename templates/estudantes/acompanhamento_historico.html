@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block page_title %}Histórico de acompanhamento{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="get" class="form-row" style="margin-bottom:1rem">
+    <div class="form-group mb-0">
+      <label>Estudante</label>
+      <select class="form-control" name="estudante" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        {% for estudante in estudantes %}
+        <option value="{{ estudante.pk }}" {% if request.GET.estudante == estudante.pk|stringformat:'s' %}selected{% endif %}>{{ estudante.nome_completo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr><th>Data</th><th>Estudante</th>{% if user.is_coordenacao %}<th>Professor(a)</th>{% endif %}<th>Observação</th><th>Estratégias</th></tr>
+      </thead>
+      <tbody>
+        {% for registro in registros %}
+        <tr>
+          <td>{{ registro.data|date:'d/m/Y' }}</td>
+          <td><a href="{% url 'estudantes:detail' registro.estudante.pk %}?tab=acompanhamentos">{{ registro.estudante.nome_completo }}</a></td>
+          {% if user.is_coordenacao %}<td>{{ registro.professor|default:'—' }}</td>{% endif %}
+          <td>{{ registro.observacao|truncatechars:80 }}</td>
+          <td class="text-muted">{{ registro.estrategias_aplicadas|truncatechars:60|default:'—' }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5"><div class="empty-state">{% icon 'clipboard' size=28 %}<div style="margin-top:.5rem">Nenhum registro de acompanhamento encontrado.</div></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

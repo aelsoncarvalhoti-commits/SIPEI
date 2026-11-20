@@ -28,8 +28,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     # Setting the constraint to IMMEDIATE to allow changing data in the same
     # transaction.
     sql_create_column_inline_fk = (
-        "CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(deferrable)s"
-        "; SET CONSTRAINTS %(namespace)s%(name)s IMMEDIATE"
+        "CONSTRAINT %(name)s REFERENCES %(to_table)s(%(to_column)s)%(on_delete_db)s"
+        "%(deferrable)s; SET CONSTRAINTS %(namespace)s%(name)s IMMEDIATE"
     )
     # Setting the constraint to IMMEDIATE runs any deferred checks to allow
     # dropping it in the same transaction.
@@ -322,7 +322,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self.execute(index.remove_sql(model, self, concurrently=concurrently))
 
     def _delete_index_sql(self, model, name, sql=None, concurrently=False):
-        sql = (
+        sql = sql or (
             self.sql_delete_index_concurrently
             if concurrently
             else self.sql_delete_index

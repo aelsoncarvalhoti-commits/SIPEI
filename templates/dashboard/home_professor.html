@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block page_title %}Bem-Vindo, {{ user.get_perfil_display }}{% endblock %}
+{% block breadcrumb %}<div class="subtitle">Sistema de Gestão do Plano Educacional Individualizado - PEI</div>{% endblock %}
+{% block content %}
+
+<div class="grid grid-3" style="margin-bottom:1.25rem">
+  <div class="stat-card stat-card--green">
+    <span class="stat-label">Meus estudantes</span>
+    <div class="stat-value">{{ total_estudantes }}</div>
+    <span class="stat-sub">Sob sua responsabilidade</span>
+  </div>
+  <div class="stat-card stat-card--purple">
+    <span class="stat-label">Vencendo em breve</span>
+    <div class="stat-value">{{ peis_vencendo|length }}</div>
+    <span class="stat-sub">PEIs nos próximos 30 dias</span>
+  </div>
+  <div class="stat-card stat-card--orange">
+    <span class="stat-label">Registros recentes</span>
+    <div class="stat-value">{{ ultimos_acompanhamentos|length }}</div>
+    <span class="stat-sub">Últimos acompanhamentos</span>
+  </div>
+</div>
+
+<div class="section-title">Acessos rápidos</div>
+<div class="quick-panel" style="margin-bottom:1.25rem">
+  <a class="quick-link" href="{% url 'estudantes:list' %}">
+    <div class="icon-box">{% icon 'users' size=20 %}</div>
+    <div>
+      <div class="title">Meus estudantes</div>
+      <div class="subtitle">Ver perfis e PEIs</div>
+    </div>
+  </a>
+  <a class="quick-link" href="{% url 'estudantes:acompanhamento_historico' %}">
+    <div class="icon-box">{% icon 'clipboard' size=20 %}</div>
+    <div>
+      <div class="title">Meus acompanhamentos</div>
+      <div class="subtitle">Histórico de registros</div>
+    </div>
+  </a>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <div class="card-header"><h2>Meus estudantes</h2></div>
+    {% if estudantes %}
+    <ul class="avatar-list">
+      {% for estudante in estudantes %}
+      <li>
+        <div class="avatar">{% icon 'user' size=16 %}</div>
+        <div class="info">
+          <a class="name" href="{% url 'estudantes:detail' estudante.pk %}">{{ estudante.nome_completo }}</a>
+          <span class="sub">{{ estudante.get_necessidade_especifica_display }}</span>
+        </div>
+        <a class="btn btn-sm btn-outline" href="{% url 'estudantes:acompanhamento_create' estudante.pk %}">Registrar</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state">{% icon 'users' size=28 %}<div style="margin-top:.5rem">Nenhum estudante vinculado a você ainda. Procure a Coordenação CAPNE/AEE.</div></div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h2>Próximas atualizações de PEI</h2></div>
+    {% if peis_vencendo %}
+    <ul class="avatar-list">
+      {% for pei in peis_vencendo %}
+      <li>
+        <div class="avatar">{% icon 'user' size=16 %}</div>
+        <div class="info">
+          <a class="name" href="{% url 'estudantes:detail' pei.estudante.pk %}">{{ pei.estudante.nome_completo }}</a>
+          <span class="sub">PEI vence em {{ pei.dias_para_vencer }} dia{{ pei.dias_para_vencer|pluralize }}</span>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state">{% icon 'check-circle' size=28 %}<div style="margin-top:.5rem">Nenhum PEI vencendo nos próximos 30 dias.</div></div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card" style="margin-top:1.25rem">
+  <div class="card-header"><h2>Últimos registros de acompanhamento</h2></div>
+  {% if ultimos_acompanhamentos %}
+  <table class="data-table">
+    <thead><tr><th>Estudante</th><th>Data</th><th>Observação</th></tr></thead>
+    {% for registro in ultimos_acompanhamentos %}
+    <tr>
+      <td><a href="{% url 'estudantes:detail' registro.estudante.pk %}">{{ registro.estudante.nome_completo }}</a></td>
+      <td>{{ registro.data|date:'d/m/Y' }}</td>
+      <td class="text-muted">{{ registro.observacao|truncatechars:80 }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="empty-state">{% icon 'clipboard' size=28 %}<div style="margin-top:.5rem">Você ainda não registrou nenhum acompanhamento.</div></div>
+  {% endif %}
+</div>
+
+{% endblock %}

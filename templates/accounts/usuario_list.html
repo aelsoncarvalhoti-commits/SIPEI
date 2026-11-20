@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block page_title %}Usuários{% endblock %}
+{% block breadcrumb %}<div class="breadcrumb">Gerencie os usuários que acessam o sistema</div>{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'accounts:usuario_create' %}" class="btn">{% icon 'plus' size=16 %} Novo usuário</a>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <form method="get" class="d-flex gap-2" style="margin-bottom:1rem; align-items:flex-start; flex-wrap:wrap">
+    <div class="search-input">
+      {% icon 'search' size=16 css_class='search-icon' %}
+      <input class="form-control" type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Buscar por nome ou matrícula...">
+    </div>
+    <details class="filter-details">
+      <summary class="btn btn-outline">{% icon 'filter' size=16 %} Filtrar</summary>
+      <div class="filter-panel">
+        <div class="form-group mb-0">
+          <label>Perfil</label>
+          <select class="form-control" name="perfil">
+            <option value="">Todos</option>
+            {% for value, label in perfis %}
+            <option value="{{ value }}" {% if request.GET.perfil == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button class="btn btn-sm btn-block" type="submit" style="margin-top:.75rem">Aplicar</button>
+      </div>
+    </details>
+  </form>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nome</th><th>Matrícula SIAPE</th><th>E-mail</th><th>Perfil</th><th>Status</th><th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+          <td>
+            <div class="d-flex align-center gap-2">
+              <div class="avatar">{{ usuario.first_name|slice:':1' }}{{ usuario.last_name|slice:':1' }}</div>
+              {{ usuario.get_full_name|default:usuario.username }}
+            </div>
+          </td>
+          <td>{{ usuario.registro|default:'—' }}</td>
+          <td>{{ usuario.email|default:'—' }}</td>
+          <td>
+            {% if usuario.is_coordenacao %}<span class="badge">{{ usuario.get_perfil_display }}</span>
+            {% else %}<span class="badge badge-muted">{{ usuario.get_perfil_display }}</span>{% endif %}
+          </td>
+          <td>
+            {% if usuario.ativo %}<span class="badge">Ativo</span>{% else %}<span class="badge badge-danger">Inativo</span>{% endif %}
+          </td>
+          <td>
+            <div class="btn-group">
+              <a class="icon-btn" href="{% url 'accounts:usuario_update' usuario.pk %}" title="Editar">{% icon 'edit' size=15 %}</a>
+              {% if usuario != request.user %}
+              <form method="post" action="{% url 'accounts:usuario_toggle_ativo' usuario.pk %}" onsubmit="return confirm('{% if usuario.ativo %}Desativar{% else %}Ativar{% endif %} o acesso de {{ usuario }}?');">
+                {% csrf_token %}
+                <button class="icon-btn icon-btn-danger" type="submit" title="{% if usuario.ativo %}Desativar{% else %}Ativar{% endif %}">{% icon 'trash' size=15 %}</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6"><div class="empty-state">{% icon 'users' size=28 %}<div style="margin-top:.5rem">Nenhum usuário encontrado.</div></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if usuarios %}
+  <div class="pagination-bar">
+    <span>Mostrando 1 a {{ total_usuarios }} de {{ total_usuarios }} usuário{{ total_usuarios|pluralize }}</span>
+    <div class="pagination-controls">
+      <button class="icon-btn" disabled>{% icon 'chevron-left' size=15 %}</button>
+      <span class="badge">1</span>
+      <button class="icon-btn" disabled>{% icon 'chevron-right' size=15 %}</button>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

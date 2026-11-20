@@ -1,8 +1,7 @@
 "Functions that help with dynamically creating decorators for views."
 
 from functools import partial, update_wrapper, wraps
-
-from asgiref.sync import iscoroutinefunction, markcoroutinefunction
+from inspect import iscoroutinefunction, markcoroutinefunction
 
 
 class classonlymethod(classmethod):
@@ -150,8 +149,8 @@ def make_middleware_decorator(middleware_class):
                         response = middleware.process_template_response(
                             request, response
                         )
-                    # Defer running of process_response until after the template
-                    # has been rendered:
+                    # Defer running of process_response until after the
+                    # template has been rendered:
                     if hasattr(middleware, "process_response"):
 
                         def callback(response):

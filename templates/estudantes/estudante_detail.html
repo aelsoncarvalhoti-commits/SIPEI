@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load icons %}
+{% block page_title %}{{ estudante.nome_completo }}{% endblock %}
+{% block breadcrumb %}<div class="breadcrumb"><a href="{% url 'estudantes:list' %}">Estudantes</a> / Perfil</div>{% endblock %}
+{% block topbar_actions %}
+<div class="btn-group">
+  <a class="btn btn-outline" href="{% url 'pei:detail' estudante.pk %}">{% icon 'file-text' size=16 %} Ver PEI</a>
+  <a class="btn btn-outline" href="{% url 'estudantes:acompanhamento_create' estudante.pk %}">{% icon 'edit' size=16 %} Registrar acompanhamento</a>
+  {% if user.is_coordenacao %}
+  <a class="btn" href="{% url 'estudantes:update' estudante.pk %}">Editar dados</a>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card" style="margin-bottom:1.25rem">
+  <div class="d-flex align-center gap-2 flex-wrap justify-between">
+    <div class="d-flex align-center gap-2">
+      <div class="avatar avatar-lg">
+        {% if estudante.foto %}<img src="{{ estudante.foto.url }}" alt="">{% else %}{{ estudante.nome_completo|slice:':1' }}{% endif %}
+      </div>
+      <div>
+        <h2 style="margin-bottom:.2rem">{{ estudante.nome_completo }}</h2>
+        <div class="text-muted" style="font-size:.85rem">
+          Matrícula {{ estudante.matricula }}{% if estudante.curso %} · {{ estudante.curso }}{% endif %}{% if estudante.turma %} · Turma {{ estudante.turma }}{% endif %}
+        </div>
+        <div class="d-flex gap-2" style="margin-top:.5rem">
+          <span class="badge">{{ estudante.get_necessidade_especifica_display }}</span>
+          {% if not estudante.ativo %}<span class="badge badge-muted">Inativo</span>{% endif %}
+          {% if pei %}
+            {% if pei.status == 'vigente' %}<span class="badge">PEI vigente</span>
+            {% elif pei.status == 'vencido' %}<span class="badge badge-danger">PEI vencido</span>
+            {% else %}<span class="badge badge-warning">PEI {{ pei.get_status_display|lower }}</span>{% endif %}
+          {% else %}
+            <span class="badge badge-muted">PEI não elaborado</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <a href="?tab=identificacao" class="{% if tab == 'identificacao' %}active{% endif %}">Identificação</a>
+  <a href="?tab=diagnostico" class="{% if tab == 'diagnostico' %}active{% endif %}">Diagnóstico</a>
+  <a href="?tab=perfil" class="{% if tab == 'perfil' %}active{% endif %}">Perfil de aprendizagem</a>
+  <a href="?tab=adaptacoes" class="{% if tab == 'adaptacoes' %}active{% endif %}">Adaptações</a>
+  <a href="?tab=componentes" class="{% if tab == 'componentes' %}active{% endif %}">Componentes curriculares</a>
+  <a href="?tab=planejamentos" class="{% if tab == 'planejamentos' %}active{% endif %}">Planejamentos</a>
+  <a href="?tab=acompanhamentos" class="{% if tab == 'acompanhamentos' %}active{% endif %}">Acompanhamentos</a>
+</div>
+
+{% if tab == 'identificacao' %}
+<div class="card">
+  <div class="card-header"><h3>Dados de identificação</h3></div>
+  <table class="data-table">
+    <tr><th style="width:35%">Nome completo</th><td>{{ estudante.nome_completo }}</td></tr>
+    <tr><th>Data de nascimento</th><td>{{ estudante.data_nascimento|date:'d/m/Y'|default:'—' }}{% if estudante.idade %} ({{ estudante.idade }} anos){% endif %}</td></tr>
+    <tr><th>Matrícula</th><td>{{ estudante.matricula }}</td></tr>
+    <tr><th>Curso</th><td>{{ estudante.curso|default:'—' }}</td></tr>
+    <tr><th>Turma</th><td>{{ estudante.turma|default:'—' }}</td></tr>
+    <tr><th>Campus</th><td>{{ estudante.campus }}</td></tr>
+    <tr><th>Telefone</th><td>{{ estudante.telefone|default:'—' }}</td></tr>
+    <tr><th>E-mail</th><td>{{ estudante.email|default:'—' }}</td></tr>
+    <tr><th>Responsável</th><td>{{ estudante.responsavel_nome|default:'—' }}</td></tr>
+    <tr><th>Telefone do responsável</th><td>{{ estudante.responsavel_telefone|default:'—' }}</td></tr>
+    <tr><th>Professor(a) AEE responsável</th><td>{{ estudante.professor_responsavel|default:'Não atribuído' }}</td></tr>
+    <tr><th>Necessidade específica</th><td>{{ estudante.get_necessidade_especifica_display }}</td></tr>
+    <tr><th>Descrição</th><td>{{ estudante.descricao_necessidade|linebreaksbr|default:'—' }}</td></tr>
+  </table>
+</div>
+
+{% elif tab == 'diagnostico' %}
+<div class="card">
+  <div class="card-header">
+    <h3>Diagnóstico</h3>
+    {% if user.is_coordenacao %}<a class="btn btn-sm btn-outline" href="{% url 'estudantes:diagnostico_update' estudante.pk %}">{% if diagnostico %}Editar{% else %}+ Adicionar{% endif %}</a>{% endif %}
+  </div>
+  {% if diagnostico %}
+  <table class="data-table">
+    <tr><th style="width:35%">CID</th><td>{{ diagnostico.cid|default:'—' }}</td></tr>
+    <tr><th>Data do diagnóstico</th><td>{{ diagnostico.data_diagnostico|date:'d/m/Y'|default:'—' }}</td></tr>
+    <tr><th>Profissional responsável</th><td>{{ diagnostico.profissional_responsavel|default:'—' }}</td></tr>
+    <tr><th>Descrição</th><td>{{ diagnostico.descricao|linebreaksbr|default:'—' }}</td></tr>
+    <tr><th>Observações médicas</th><td>{{ diagnostico.observacoes|linebreaksbr|default:'—' }}</td></tr>
+    <tr><th>Laudo médico</th><td>{% if diagnostico.laudo_medico %}<a href="{{ diagnostico.laudo_medico.url }}" target="_blank">Baixar arquivo</a>{% else %}—{% endif %}</td></tr>
+  </table>
+  {% else %}
+  <div class="empty-state">{% icon 'activity' size=28 %}<div style="margin-top:.5rem">Diagnóstico ainda não cadastrado.</div></div>
+  {% endif %}
+</div>
+
+{% elif tab == 'perfil' %}
+<div class="card">
+  <div class="card-header">
+    <h3>Perfil de aprendizagem</h3>
+    {% if user.is_coordenacao %}<a class="btn btn-sm btn-outline" href="{% url 'estudantes:perfil_update' estudante.pk %}">{% if perfil_aprendizagem %}Editar{% else %}+ Adicionar{% endif %}</a>{% endif %}
+  </div>
+  {% if perfil_aprendizagem %}
+  <table class="data-table">
+    <tr><th style="width:35%">Pontos fortes</th><td>{{ perfil_aprendizagem.pontos_fortes|linebreaksbr|default:'—' }}</td></tr>
+    <tr><th>Principais dificuldades</th><td>{{ perfil_aprendizagem.dificuldades|linebreaksbr|default:'—' }}</td></tr>
+    <tr><th>Estilo de aprendizagem</th><td>{{ perfil_aprendizagem.estilo_aprendizagem|linebreaksbr|default:'—' }}</td></tr>
+    <tr><th>Interesses</th><td>{{ perfil_aprendizagem.interesses|linebreaksbr|default:'—' }}</td></tr>
+    <tr><th>Observações</th><td>{{ perfil_aprendizagem.observacoes|linebreaksbr|default:'—' }}</td></tr>
+  </table>
+  {% else %}
+  <div class="empty-state">{% icon 'book-open' size=28 %}<div style="margin-top:.5rem">Perfil de aprendizagem ainda não cadastrado.</div></div>
+  {% endif %}
+</div>
+
+{% elif tab == 'adaptacoes' %}
+<div class="card">
+  <div class="card-header">
+    <h3>Adaptações</h3>
+    {% if user.is_coordenacao %}<a class="btn btn-sm btn-outline" href="{% url 'estudantes:adaptacao_create' estudante.pk %}">{% icon 'plus' size=14 %} Nova adaptação</a>{% endif %}
+  </div>
+  {% if adaptacoes %}
+  <table class="data-table">
+    <thead><tr><th>Tipo</th><th>Componente</th><th>Descrição</th>{% if user.is_coordenacao %}<th></th>{% endif %}</tr></thead>
+    {% for item in adaptacoes %}
+    <tr>
+      <td><span class="badge">{{ item.get_tipo_display }}</span></td>
+      <td>{{ item.disciplina|default:'—' }}</td>
+      <td>{{ item.descricao|truncatechars:90 }}</td>
+      {% if user.is_coordenacao %}
+      <td>
+        <div class="btn-group">
+          <a class="btn btn-sm btn-outline" href="{% url 'estudantes:adaptacao_update' estudante.pk item.pk %}">Editar</a>
+          <form method="post" action="{% url 'estudantes:adaptacao_delete' estudante.pk item.pk %}" onsubmit="return confirm('Remover esta adaptação?');">
+            {% csrf_token %}<button class="btn btn-sm btn-danger" type="submit">Excluir</button>
+          </form>
+        </div>
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="empty-state">{% icon 'settings' size=28 %}<div style="margin-top:.5rem">Nenhuma adaptação cadastrada.</div></div>
+  {% endif %}
+</div>
+
+{% elif tab == 'componentes' %}
+<div class="card">
+  <div class="card-header">
+    <h3>Componentes curriculares</h3>
+    {% if user.is_coordenacao %}<a class="btn btn-sm btn-outline" href="{% url 'estudantes:componente_create' estudante.pk %}">{% icon 'plus' size=14 %} Novo componente</a>{% endif %}
+  </div>
+  {% if componentes %}
+  <table class="data-table">
+    <thead><tr><th>Componente</th><th>Professor(a)</th><th>C.H. semanal</th><th>Adaptações necessárias</th>{% if user.is_coordenacao %}<th></th>{% endif %}</tr></thead>
+    {% for item in componentes %}
+    <tr>
+      <td>{{ item.disciplina }}</td>
+      <td>{{ item.professor|default:'—' }}</td>
+      <td>{{ item.carga_horaria|default:'—' }}</td>
+      <td>{{ item.adaptacoes_necessarias|truncatechars:70|default:'—' }}</td>
+      {% if user.is_coordenacao %}
+      <td>
+        <div class="btn-group">
+          <a class="btn btn-sm btn-outline" href="{% url 'estudantes:componente_update' estudante.pk item.pk %}">Editar</a>
+          <form method="post" action="{% url 'estudantes:componente_delete' estudante.pk item.pk %}" onsubmit="return confirm('Remover este componente?');">
+            {% csrf_token %}<button class="btn btn-sm btn-danger" type="submit">Excluir</button>
+          </form>
+        </div>
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="empty-state">{% icon 'book-open' size=28 %}<div style="margin-top:.5rem">Nenhum componente curricular cadastrado.</div></div>
+  {% endif %}
+</div>
+
+{% elif tab == 'planejamentos' %}
+<div class="card">
+  <div class="card-header">
+    <h3>Planejamentos pedagógicos</h3>
+    {% if user.is_coordenacao %}<a class="btn btn-sm btn-outline" href="{% url 'estudantes:planejamento_create' estudante.pk %}">{% icon 'plus' size=14 %} Novo planejamento</a>{% endif %}
+  </div>
+  {% if planejamentos %}
+  <table class="data-table">
+    <thead><tr><th>Componente</th><th>Objetivo</th><th>Prazo</th><th>Status</th>{% if user.is_coordenacao %}<th></th>{% endif %}</tr></thead>
+    {% for item in planejamentos %}
+    <tr>
+      <td>{{ item.disciplina|default:'—' }}</td>
+      <td>{{ item.objetivo|truncatechars:80 }}</td>
+      <td>{{ item.prazo|date:'d/m/Y'|default:'—' }}</td>
+      <td>
+        {% if item.status == 'concluido' %}<span class="badge">Concluído</span>
+        {% elif item.status == 'em_andamento' %}<span class="badge badge-warning">Em andamento</span>
+        {% else %}<span class="badge badge-muted">Planejado</span>{% endif %}
+      </td>
+      {% if user.is_coordenacao %}
+      <td>
+        <div class="btn-group">
+          <a class="btn btn-sm btn-outline" href="{% url 'estudantes:planejamento_update' estudante.pk item.pk %}">Editar</a>
+          <form method="post" action="{% url 'estudantes:planejamento_delete' estudante.pk item.pk %}" onsubmit="return confirm('Remover este planejamento?');">
+            {% csrf_token %}<button class="btn btn-sm btn-danger" type="submit">Excluir</button>
+          </form>
+        </div>
+      </td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="empty-state">{% icon 'edit' size=28 %}<div style="margin-top:.5rem">Nenhum planejamento cadastrado.</div></div>
+  {% endif %}
+</div>
+
+{% elif tab == 'acompanhamentos' %}
+<div class="card">
+  <div class="card-header">
+    <h3>Registros de acompanhamento</h3>
+    <a class="btn btn-sm" href="{% url 'estudantes:acompanhamento_create' estudante.pk %}">{% icon 'plus' size=14 %} Registrar acompanhamento</a>
+  </div>
+  {% if acompanhamentos %}
+  <table class="data-table">
+    <thead><tr><th>Data</th><th>Professor(a)</th><th>Observação</th></tr></thead>
+    {% for registro in acompanhamentos %}
+    <tr>
+      <td>{{ registro.data|date:'d/m/Y' }}</td>
+      <td>{{ registro.professor|default:'—' }}</td>
+      <td>{{ registro.observacao|truncatechars:90 }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div class="empty-state">{% icon 'clipboard' size=28 %}<div style="margin-top:.5rem">Nenhum acompanhamento registrado ainda.</div></div>
+  {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
