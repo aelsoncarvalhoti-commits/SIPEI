@@ -1,15 +1,10 @@
 # SIPEI — Sistema Integrado de Plano Educacional Individualizado
 
-Sistema web para a Coordenação de Atendimento às Pessoas com Necessidades
-Específicas (CAPNE) do IFBA — campus Porto Seguro — centralizar a gestão do
-Plano Educacional Individualizado (PEI), substituindo os registros feitos em
-documentos Word.
+Sistema web desenvolvido a partir das necessidades da CAPNE do IFBA, campus Porto Seguro. O objetivo é reunir em um só lugar os dados dos estudantes, os Planos Educacionais Individualizados (PEIs) e os registros de acompanhamento pedagógico, antes organizados em documentos Word.
 
-Desenvolvido com **Django + HTML + CSS** (sem frontend framework/SPA).
-<<<<<<< HEAD
-=======
+Desenvolvido com **Python, Django, HTML e CSS**.
 
-## Funcionalidades (requisitos atendidos)
+## Funcionalidades
 
 - **RF001** — Cadastro de estudantes (curso, necessidades específicas, dados de contato).
 - **RF002** — Registros pedagógicos datados feitos pelos professores (acompanhamentos).
@@ -48,7 +43,7 @@ Acesse `http://localhost:8000/`.
 | `coordenacao` | `capne@2026` | Coordenação CAPNE/AEE (também superusuário, acessa `/admin/`) |
 | `professor` | `professor@2026` | Professor |
 
-**Troque essas senhas antes de usar o sistema em produção.**
+Essas contas são apenas para testes locais. Não use essas senhas em um ambiente real.
 
 Para criar apenas um superusuário/administrador manualmente:
 
@@ -75,7 +70,9 @@ static/css/     folha de estilos única (tema institucional verde)
   produção, ajuste `DATABASES` em `sipei/settings.py` (ex.: PostgreSQL via
   variáveis de ambiente).
 - Upload de arquivos (fotos, laudos médicos) salvos em `media/`.
-- Layout responsivo (RNF03), testado de 360px a telas desktop.
-- `SECRET_KEY`, `DEBUG` e `ALLOWED_HOSTS` são lidos de variáveis de ambiente,
-  com valores padrão seguros para desenvolvimento local.
->>>>>>> 8e50103 (Atualizando o Projeto)
+- Layout responsivo para celular e computador.
+- `SECRET_KEY`, `DEBUG` e `ALLOWED_HOSTS` podem ser configurados por variáveis de ambiente. Antes de publicar o sistema, é necessário revisar essas configurações de segurança.
+
+## Situação atual
+
+O sistema funciona em ambiente local, com dados fictícios para demonstração. Ainda são necessários testes adicionais, validação com a CAPNE e ajustes de segurança antes de uma possível implantação institucional.
